@@ -1,0 +1,168 @@
+<html>
+    <head>
+        <title>CPSC 314 Assignment 3</title>
+        <style>
+            body { margin: 0; }
+            canvas { width: 100%; height: 100% }
+            </style>
+    </head>
+    <body>
+        <script src="js/three.min.js"></script>
+        <script src="js/OrbitControls1.js"></script>
+        <script src="js/THREEx.KeyboardState.js"></script>
+        <script src="js/OBJLoader.js"></script>
+        <script type="x-shader/x-vertex" id="vertexShader1">
+            // GLSL vertex shader
+            varying vec4 v_Normal;
+            varying vec4 v_ViewPosition;
+            
+            void main() {
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+                vec4 normal4 = vec4(normal,0);
+                v_Normal = modelViewMatrix*normal4;
+                v_ViewPosition = modelViewMatrix*vec4(position,1.0);
+                
+                
+            }
+        </script>
+        <script id="vertexShader" type="x-shader/x-vertex">
+            varying vec2 vUv;
+
+            void main()
+            {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+            }
+        </script>
+        <script type="x-shader/x-fragment" id="myPhong">
+            // GLSL fragment shader
+            uniform vec3 lightColor;        // light: diffuse + specular
+            uniform vec3 ambientColor;      // light: ambient
+            uniform vec3 lightPosition;     // light position
+            uniform vec3 ka;                // ambient reflectance
+            uniform vec3 kd;                // diffuse reflectance
+            uniform vec3 ks;                // specular reflectance
+            uniform float nSpec;            // shininess
+            varying vec4 v_Normal;          // vertex normal, in VCS
+            varying vec4 v_ViewPosition;    // vertex position, in VCS
+            
+            void main() {
+                
+                // normalize input data
+                vec3 n = normalize(vec3(v_Normal));
+                vec3 e = normalize(vec3(-v_ViewPosition));
+                vec3 l = normalize(lightPosition-v_ViewPosition.xyz);
+                vec3 r = normalize(-reflect(l,n));
+                
+                // AMBIENT TERM
+                vec4 ambient = vec4(ambientColor*ka, 1.0);
+                
+                // DIFFUSE TERM
+                float intensity = (max(dot(n,l), 0.0));
+                vec4 diffuse = vec4(kd*(intensity), 1.0);
+                diffuse = clamp(diffuse, 0.0, 1.0);
+                
+                // SPECULAR TERM
+                float specIntensity = max(dot(r, e), 0.0);
+                vec4 specular = vec4(ks*pow(specIntensity, nSpec), 1.0);
+                specular = clamp(specular, 0.0, 1.0);
+                
+                
+                // TOTAL
+                vec4 total = ambient + diffuse + specular;
+                
+                //gl_FragColor = vec4(0.5,0,0,1);
+                gl_FragColor =total;
+            }
+        </script>
+        <script type="x-shader/x-fragment" id="guardfragmentShader">
+            uniform sampler2D baseTexture;
+            uniform float baseSpeed;
+            
+            uniform sampler2D noiseTexture;
+            uniform float noiseScale;
+            
+            uniform float alpha;
+            uniform float time;
+            
+            varying vec2 vUv;
+            
+            uniform vec2 resolution;
+            
+            
+            void main() {
+                
+                vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+                vec4 noise = texture2D(noiseTexture, uvTimeShift);
+                
+                vec2 uvNoiseTimeShift = vUv + noiseScale * vec2(noise.r, noise.g);
+                
+                vec4 baseColor = texture2D(baseTexture, uvNoiseTimeShift);
+                baseColor.a = alpha;
+                gl_FragColor = baseColor;
+                
+            }
+        </script>
+
+        <script type="x-shader/x-fragment" id="fragmentShader">
+            uniform sampler2D baseTexture;
+            uniform float baseSpeed;
+           
+            uniform sampler2D noiseTexture;
+            uniform float noiseScale;
+           
+            uniform float alpha;
+            uniform float time;
+            
+            varying vec2 vUv;
+            
+            uniform vec2 resolution;
+            
+            uniform float fogDensity; // adding fog functionality
+            uniform vec3 fogColor; // adding fog functionality
+
+
+            void main() {
+                
+                vec2 uvTimeShift = vUv + vec2( -0.7, 1.5 ) * time * baseSpeed;
+                vec4 noise = texture2D(noiseTexture, uvTimeShift);
+                
+                vec2 uvNoiseTimeShift = vUv + noiseScale * vec2(noise.r, noise.g);
+                
+                vec4 baseColor = texture2D(baseTexture, uvNoiseTimeShift);
+                baseColor.a = alpha;
+                gl_FragColor = baseColor;
+                
+                float depth = gl_FragCoord.z / gl_FragCoord.w;
+                const float LOG2 = 1.442695;
+                float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );
+                fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );
+                
+                
+                gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
+                
+            }
+        </script>
+        <script src="js/loadOBJ.js"></script>
+        <script src="js/loadOBJguard.js"></script>
+        <script src="a3.js"></script>
+        <!-- game rules. -->
+   
+        <div id="rules" title="How To Play">
+            <br><br>
+            <font color="black">LET'S PLAY... </font><br>
+            <font color="black">You're hidden in the box and that is the perfect opportunity to get into the car and run away! </font><br>
+            <font color="black">Goal:<br>Arrive at the car.</font><br>
+            <font color="black">Rules:</font><br>
+            <font color="black">Use keys A: right W: ahead, S: back, D: left to arrive at the car. The keys are jumbled for extra confusion!</font><br>
+            <font color="black">You will have to restart if you go through any square with a guard or a alarm.</font><br>
+            <font color="black">Hint: <br> The movement is fixed, but the scene is rotating to confuse you!</font><br>
+            <font color="black">Alter your texture by pressing keys 1 through 6. </font><br>
+            <font color="black">Obtaining the blue orb will enable Water Mode! </font><br>
+            <font color="black">The box will transform into a body of water allowing you to pass through the obsticles... HOWEVER heat will cause some water to evaporate. </font><br>
+            <font color="black">The body of water is reduced everytime you pass through a lava guard or laser beam. Remaining life is displayed above the box in the form of hearts. Enjoy!</font><br>
+            <br>
+        </div>
+
+    </body>
+</html>
