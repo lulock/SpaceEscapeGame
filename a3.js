@@ -114,10 +114,11 @@ xAxis.parent = yAxis.parent = zAxis.parent = originBox;
 //shape.parent = spotlight;
 
 //////////////////////////////////lava texture////////////////////////////////
-var noiseTexture = new THREE.ImageUtils.loadTexture( 'images/noise.jpg' );
+THREE.ImageUtils.crossOrigin = '';
+var noiseTexture = THREE.ImageUtils.loadTexture( 'images/noise.jpg' );
 noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping;
 
-var lavaTexture = new THREE.ImageUtils.loadTexture( 'images/lava1.jpg' );
+var lavaTexture = THREE.ImageUtils.loadTexture( 'images/lava1.jpg' );
 lavaTexture.wrapS = lavaTexture.wrapT = THREE.RepeatWrapping;
 
 this.lavaUniforms =
@@ -159,7 +160,7 @@ scene.add(ambientLight);
 // FLOOR WITH CHECKERBOARD
 
 //var floorTexture = new THREE.ImageUtils.loadTexture( 'images/checkerboard.jpg' );
-var floorTexture = new THREE.ImageUtils.loadTexture( 'images/chessboard.png' );
+var floorTexture = THREE.ImageUtils.loadTexture( 'images/chessboard.png' );
 floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 floorTexture.repeat.set( 2, 2 );
 var floorMaterial = new THREE.MeshLambertMaterial( { map: floorTexture, side: THREE.DoubleSide } );
@@ -240,7 +241,7 @@ var fugitivePhongMaterial = new THREE.MeshPhongMaterial(
 var fugitiveCubeGeometry = new THREE.BoxGeometry( 1,1,1 ); //box object
 
 ///////////////////////////Water Fugitive//////////////////////////////////
-var waterTexture = new THREE.ImageUtils.loadTexture( 'images/water.jpg' );
+var waterTexture = THREE.ImageUtils.loadTexture( 'images/water.jpg' );
 waterTexture.wrapS = waterTexture.wrapT = THREE.RepeatWrapping;
 
 this.waterUniforms = {
