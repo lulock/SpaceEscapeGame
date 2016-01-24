@@ -1,5 +1,5 @@
-Name: Leila Methnani    Student ID: 52417128    cs ID: b6m8
-Name: Milena Costa      Student ID: 60113131    cs ID: r1v9a
+Name: Leila Methnani
+Name: Milena Costa
 
 We used up 2 of our 3 grace days for this project
 
