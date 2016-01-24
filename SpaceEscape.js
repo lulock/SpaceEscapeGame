@@ -27,7 +27,7 @@ camera.lookAt(scene.position);
 scene.add(camera);
 
 ////////////////////////////SELECT YOUR ENVIRONMENT////////////////////////////////////
-
+THREE.ImageUtils.crossOrigin = '';
 ///////////////////space//////////////////////
 var spaceurls = [
                  'space/posz.jpg',
@@ -114,7 +114,6 @@ xAxis.parent = yAxis.parent = zAxis.parent = originBox;
 //shape.parent = spotlight;
 
 //////////////////////////////////lava texture////////////////////////////////
-THREE.ImageUtils.crossOrigin = '';
 var noiseTexture = THREE.ImageUtils.loadTexture( 'images/noise.jpg' );
 noiseTexture.wrapS = noiseTexture.wrapT = THREE.RepeatWrapping;
 
