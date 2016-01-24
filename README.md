@@ -1,4 +1,4 @@
-# :earth_africa: SpaceEscapeGame
-*WebGL and Three.js interactive graphics game*
+# :earth_africa: Space Escape
+*A WebGL and Three.js graphics game in collaboration with the lovely @milenamayumi*
 
 > https://htmlpreview.github.io/?https://github.com/lulock/SpaceEscapeGame/blob/master/SpaceEscape.html
